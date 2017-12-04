@@ -1,4 +1,4 @@
-TOKEN = "506195597:AAFsZmt-IvkB1T_su1l0SSI1JT1JCKaVD_Y"
+TOKEN = "493667230:AAF8OgeD0HdWUOCQLT0-CWCcQNYPxMMO72I"
 
 import requests
 
@@ -14,10 +14,11 @@ def echo(bot, update):
 
     json_dictionary = r.json()
 
+    global like_dict
     like_dict = {}
     for image_dict in json_dictionary['hits']:
         like_dict[image_dict['likes']] = image_dict['webformatURL']
-    url = like_dict.get(max(like_dict))
+    url = like_dict.pop(max(like_dict))
     update.message.reply_text(url)
 
     # list_of_urls.append(image_dict['webformatURL'])
@@ -46,6 +47,9 @@ updater = None
 def start(bot, update):
     """Send a message when the command /start is issued."""
     update.message.reply_text('type your keywords')
+def nextpic(bot, update):
+    url = like_dict.pop(max(like_dict))
+    update.message.reply_text(url)
 def error(bot, update, error):
     """Log Errors caused by Updates."""
     logger.warning('Update "%s" caused error "%s"', update, error)
@@ -58,6 +62,7 @@ def prepare():
     dp = updater.dispatcher
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(CommandHandler("nextpic", nextpic))
     # on noncommand i.e message - echo the message on Telegram
     dp.add_handler(MessageHandler(Filters.text, echo))
     # log all errors
